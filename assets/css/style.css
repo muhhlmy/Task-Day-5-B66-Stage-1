@@ -1,0 +1,30 @@
+body {
+  font-family: "Manrope", sans-serif;
+  overflow-x: hidden;
+}
+
+.bg-custom-primary {
+  background-color: #f7f9fb;
+}
+
+.bg-custom-white {
+  background-color: #ffffff;
+}
+
+.fa-brands:hover {
+  color: rgb(255, 255, 255);
+}
+
+#home,
+#contact {
+  min-height: calc(100vh - 56px);
+}
+
+.divider {
+  width: 10%;
+  height: 3px;
+}
+
+::-webkit-scrollbar {
+  width: 0px; /* makin kecil = makin tipis */
+}
