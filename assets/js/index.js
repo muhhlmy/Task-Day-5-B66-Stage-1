@@ -132,16 +132,49 @@ function saveToLocalStorage() {
 // Kalo Form di Submit
 form.addEventListener("submit", function (e) {
   e.preventDefault();
+  const allowedTypes = ["image/png", "image/jpeg"];
+
   // Ambil gambar yang di Upload
   let imageFile = inputProjectImage.files[0];
 
-  // Kalo ada gambar
-  if (imageFile) {
-    const reader = new FileReader();
+  if (!allowedTypes.includes(imageFile.type)) {
+    alert("Only JPG and PNG files are allowed.");
+  } else {
+    if (imageFile) {
+      // Kalo ada gambar
+      const reader = new FileReader();
 
-    // Kalo udah selesai baca File
-    reader.onload = function () {
-      const imageUrl = reader.result; //Hasilnya ditaro disini
+      // Kalo udah selesai baca File
+      reader.onload = function () {
+        const imageUrl = reader.result; //Hasilnya ditaro disini
+
+        const newProject = {
+          id: Date.now(),
+          name: inputProjectName.value,
+          description: inputProjectDescription.value,
+          duration: calculateDurationReadable(
+            inputProjectStartDate.value,
+            inputProjectEndDate.value,
+          ),
+          techNodeJs: document.getElementById("nodejs").checked,
+          techNextJs: document.getElementById("nextjs").checked,
+          techReactJs: document.getElementById("reactjs").checked,
+          techTypescript: document.getElementById("typescript").checked,
+          image: imageUrl,
+        };
+
+        projects.push(newProject);
+        saveToLocalStorage();
+        renderProjects();
+
+        form.reset();
+        console.log("Data Project:", projects);
+      };
+
+      reader.readAsDataURL(imageFile); //Baca File yang di Upload
+    } else {
+      // Kalo gaada Gambar
+      const imageUrl = `http://placehold.co/600x400?text=${inputProjectName.value}`; //Pakai Placeholder
 
       const newProject = {
         id: Date.now(),
@@ -161,37 +194,10 @@ form.addEventListener("submit", function (e) {
       projects.push(newProject);
       saveToLocalStorage();
       renderProjects();
-
       form.reset();
+
       console.log("Data Project:", projects);
-    };
-
-    reader.readAsDataURL(imageFile); //Baca File yang di Upload
-  } else {
-    // Kalo gaada Gambar
-    const imageUrl = `http://placehold.co/600x400?text=${inputProjectName.value}`; //Pakai Placeholder
-
-    const newProject = {
-      id: Date.now(),
-      name: inputProjectName.value,
-      description: inputProjectDescription.value,
-      duration: calculateDurationReadable(
-        inputProjectStartDate.value,
-        inputProjectEndDate.value,
-      ),
-      techNodeJs: document.getElementById("nodejs").checked,
-      techNextJs: document.getElementById("nextjs").checked,
-      techReactJs: document.getElementById("reactjs").checked,
-      techTypescript: document.getElementById("typescript").checked,
-      image: imageUrl,
-    };
-
-    projects.push(newProject);
-    saveToLocalStorage();
-    renderProjects();
-    form.reset();
-
-    console.log("Data Project:", projects);
+    }
   }
 });
 
