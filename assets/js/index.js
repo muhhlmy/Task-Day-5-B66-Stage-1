@@ -56,8 +56,8 @@ function renderProjects() {
         techIconsHTML += '<span class="fw-bold fs-6 p-1">TS</span> ';
       }
       projectHTML += `
-        <div class="col-12 col-md-6 col-lg-4 projectCard" data-id="${project.id}">
-          <div class="card h-100 shadow-sm border-0 rounded-4 p-3 bg-white">
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0 rounded-4 p-3 bg-white up-effect">
             <img
               src="${project.image}"
               class="card-img-top rounded-3"

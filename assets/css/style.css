@@ -28,3 +28,12 @@ body {
 ::-webkit-scrollbar {
   width: 0px;
 }
+
+.up-effect {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.up-effect:hover {
+  transform: translateY(-5px);
+}
