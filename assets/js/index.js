@@ -1,88 +1,91 @@
 // ======================================
-// VARIABLES
+// ELEMENT REFERENCES
 // ======================================
-// Ambil Input
-const inputProjectName = document.getElementById("projectName");
-const inputProjectDescription = document.getElementById("projectDescription");
-const inputProjectStartDate = document.getElementById("projectStartDate");
-const inputProjectEndDate = document.getElementById("projectEndDate");
-// Projects Container
-const projectsContainer = document.getElementById("projectContainer");
-// Ambil Image
-const inputProjectImage = document.getElementById("projectImage");
-// Body Form
-const form = document.getElementById("projectForm");
-// Insiasi Modal
-const projectContainerEL = document.getElementById("projectContainer");
-const projectModal = document.getElementById("projectModal");
-const closeModalBtn = document.getElementById("closeModalBtn");
 
-// Wadah buat menyimpan Object setiap Project
-let projects = [];
+// Form inputs
+const projectNameInput = document.getElementById("projectName");
+const projectDescriptionInput = document.getElementById("projectDescription");
+const projectStartDateInput = document.getElementById("projectStartDate");
+const projectEndDateInput = document.getElementById("projectEndDate");
+const projectImageInput = document.getElementById("projectImage");
 
-//Kalo ada data di Local Storage, Ambil
-const savedProjects = localStorage.getItem("projects");
-if (savedProjects) {
-  projects = JSON.parse(savedProjects);
+// Containers
+const projectContainer = document.getElementById("projectContainer");
+
+// Form
+const projectForm = document.getElementById("projectForm");
+
+// Modal
+const projectDetailModal = document.getElementById("projectModal");
+const closeProjectModalButton = document.getElementById("closeModalBtn");
+
+// ======================================
+// STATE
+// ======================================
+
+// Menyimpan seluruh data project
+let projectDataList = [];
+
+// Ambil data project dari localStorage jika tersedia
+const storedProjects = localStorage.getItem("projects");
+if (storedProjects) {
+  projectDataList = JSON.parse(storedProjects);
 }
 
 // ======================================
 // FUNCTIONS
 // ======================================
-function renderProjects() {
-  let projectHTML = "";
 
-  if (projects.length === 0) {
-    projectHTML = `
+// Menampilkan seluruh project ke halaman
+function renderProjectList() {
+  if (projectDataList.length === 0) {
+    projectContainer.innerHTML = `
     <h5 class="text-center text-secondary w-100 mt-5">
       Belum ada project saat ini.
       <br>
       Silakan tambahkan project baru di atas.
     </h5>
     `;
-  } else {
-    const projectInnerHTML = projects
-      .map((project) => renderCardProject(project))
-      .join("");
-    // console.log(projectInnerHTML);
-
-    projectsContainer.innerHTML = projectInnerHTML;
+    return;
   }
+
+  projectContainer.innerHTML = projectDataList
+    .map((projectItem) => createProjectCard(projectItem))
+    .join("");
 }
 
-// Menghitung Jumlah Bulan
-function calculateDurationReadable(startDate, endDate) {
+// Menghitung durasi project dalam format bulan
+function getReadableProjectDuration(startDate, endDate) {
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-  const diffTime = end - start; // Hasilnya dalam miliseconds
-  const days = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Konversi ke hari
+  const timeDifference = end - start; // Hasil dalam miliseconds
+  const totalDays = Math.floor(timeDifference / (1000 * 60 * 60 * 24)); // Konversi ke hari
+  const totalMonths = Math.floor(totalDays / 30); // Konversi sederhana ke bulan
 
-  const months = Math.floor(days / 30); // Konversi sederhana ke bulan
-
-  return `${months} bulan`;
+  return `${totalMonths} bulan`;
 }
 
-// Untuk nyimpen di LocalStorage
-function saveToLocalStorage() {
-  localStorage.setItem("projects", JSON.stringify(projects));
+// Menyimpan data project ke localStorage
+function saveProjectsToLocalStorage() {
+  localStorage.setItem("projects", JSON.stringify(projectDataList));
 }
 
-// Render Card
-function renderCardProject(project) {
-  let techIconsHTML = "";
+// Membuat HTML card untuk satu project
+function createProjectCard(projectItem) {
+  let technologyIconsHTML = "";
 
-  if (project.techNodeJs == true) {
-    techIconsHTML += '<i class="fa-brands fa-node-js fs-4 p-1"></i> ';
+  if (projectItem.techNodeJs == true) {
+    technologyIconsHTML += '<i class="fa-brands fa-node-js fs-4 p-1"></i> ';
   }
-  if (project.techNextJs == true) {
-    techIconsHTML += '<span class="fw-bold fs-6 p-1">Next.JS</span> ';
+  if (projectItem.techNextJs == true) {
+    technologyIconsHTML += '<span class="fw-bold fs-6 p-1">Next.JS</span> ';
   }
-  if (project.techReactJs == true) {
-    techIconsHTML += '<i class="fa-brands fa-react fs-4 p-1"></i> ';
+  if (projectItem.techReactJs == true) {
+    technologyIconsHTML += '<i class="fa-brands fa-react fs-4 p-1"></i> ';
   }
-  if (project.techTypescript == true) {
-    techIconsHTML += '<span class="fw-bold fs-6 p-1">TS</span> ';
+  if (projectItem.techTypescript == true) {
+    technologyIconsHTML += '<span class="fw-bold fs-6 p-1">TS</span> ';
   }
 
   return /* HTML */ `
@@ -91,14 +94,16 @@ function renderCardProject(project) {
         class="card h-100 shadow-sm border-0 rounded-4 p-3 bg-white up-effect"
       >
         <img
-          src="${project.image}"
+          src="${projectItem.image}"
           class="card-img-top rounded-3"
           alt="Project Image"
           style="object-fit: cover; height: 200px;"
         />
         <div class="card-body px-0 pb-0 text-start d-flex flex-column">
-          <h5 class="card-title fw-bold mb-1 text-dark">${project.name}</h5>
-          <p class="text-secondary small mb-3">Duration: ${project.duration}</p>
+          <h5 class="card-title fw-bold mb-1 text-dark">${projectItem.name}</h5>
+          <p class="text-secondary small mb-3">
+            Duration: ${projectItem.duration}
+          </p>
           <p
             class="card-text text-secondary mb-4"
             style="
@@ -108,21 +113,21 @@ function renderCardProject(project) {
             overflow: hidden;
           "
           >
-            ${project.description}
+            ${projectItem.description}
           </p>
           <div class="mb-3 text-secondary d-flex align-items-center gap-2">
-            ${techIconsHTML}
+            ${technologyIconsHTML}
           </div>
           <div class="d-flex gap-2 w-100 mt-auto">
             <button
               class="btn btn-outline-dark w-100 rounded-pill btn-view-details"
-              data-id="${project.id}"
+              data-id="${projectItem.id}"
             >
               View Details
             </button>
             <button
               class="btn btn-dark w-50 rounded-pill btn-delete"
-              data-id="${project.id}"
+              data-id="${projectItem.id}"
             >
               Delete
             </button>
@@ -133,144 +138,145 @@ function renderCardProject(project) {
   `;
 }
 
+function createObjectData(imageSource) {
+  return {
+    id: Date.now(),
+    name: projectNameInput.value,
+    description: projectDescriptionInput.value,
+    duration: getReadableProjectDuration(
+      projectStartDateInput.value,
+      projectEndDateInput.value,
+    ),
+    techNodeJs: document.getElementById("nodejs").checked,
+    techNextJs: document.getElementById("nextjs").checked,
+    techReactJs: document.getElementById("reactjs").checked,
+    techTypescript: document.getElementById("typescript").checked,
+    image: imageSource,
+  };
+}
+
+function addProject(projectData) {
+  projectDataList.push(projectData);
+  saveProjectsToLocalStorage();
+  renderProjectList();
+  projectForm.reset();
+}
+
 // ======================================
-// EVENTS HANDLER
+// EVENT HANDLERS
 // ======================================
 
-// Kalo Form di Submit
-form.addEventListener("submit", function (e) {
-  e.preventDefault();
-  const allowedTypes = ["image/png", "image/jpeg"];
+// Menangani submit form project
+projectForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+  const allowedImageTypes = ["image/png", "image/jpeg"];
 
-  // Ambil gambar yang di Upload
-  let imageFile = inputProjectImage.files[0];
+  // Ambil file gambar yang di-upload
+  let selectedImageFile = projectImageInput.files[0];
 
-  if (!allowedTypes.includes(imageFile.type)) {
+  if (
+    selectedImageFile &&
+    !allowedImageTypes.includes(selectedImageFile.type)
+  ) {
     alert("Only JPG and PNG files are allowed.");
+    return;
+  }
+
+  if (selectedImageFile) {
+    // Jika user meng-upload gambar
+    const fileReader = new FileReader();
+
+    // Setelah file selesai dibaca
+    fileReader.onload = function () {
+      const imageSource = fileReader.result; // Hasil file dibaca dalam bentuk base64/url
+
+      addProject(createObjectData(imageSource));
+
+      console.log("Data Project:", projectDataList);
+    };
+
+    fileReader.readAsDataURL(selectedImageFile); // Membaca file upload
   } else {
-    if (imageFile) {
-      // Kalo ada gambar
-      const reader = new FileReader();
+    // Jika tidak ada gambar, gunakan placeholder
+    const imageSource = `http://placehold.co/600x400?text=${projectNameInput.value}`;
 
-      // Kalo udah selesai baca File
-      reader.onload = function () {
-        const imageUrl = reader.result; //Hasilnya ditaro disini
+    addProject(createObjectData(imageSource));
 
-        const newProject = {
-          id: Date.now(),
-          name: inputProjectName.value,
-          description: inputProjectDescription.value,
-          duration: calculateDurationReadable(
-            inputProjectStartDate.value,
-            inputProjectEndDate.value,
-          ),
-          techNodeJs: document.getElementById("nodejs").checked,
-          techNextJs: document.getElementById("nextjs").checked,
-          techReactJs: document.getElementById("reactjs").checked,
-          techTypescript: document.getElementById("typescript").checked,
-          image: imageUrl,
-        };
-
-        projects.push(newProject);
-        saveToLocalStorage();
-        renderProjects();
-
-        form.reset();
-        console.log("Data Project:", projects);
-      };
-
-      reader.readAsDataURL(imageFile); //Baca File yang di Upload
-    } else {
-      // Kalo gaada Gambar
-      const imageUrl = `http://placehold.co/600x400?text=${inputProjectName.value}`; //Pakai Placeholder
-
-      const newProject = {
-        id: Date.now(),
-        name: inputProjectName.value,
-        description: inputProjectDescription.value,
-        duration: calculateDurationReadable(
-          inputProjectStartDate.value,
-          inputProjectEndDate.value,
-        ),
-        techNodeJs: document.getElementById("nodejs").checked,
-        techNextJs: document.getElementById("nextjs").checked,
-        techReactJs: document.getElementById("reactjs").checked,
-        techTypescript: document.getElementById("typescript").checked,
-        image: imageUrl,
-      };
-
-      projects.push(newProject);
-      saveToLocalStorage();
-      renderProjects();
-      form.reset();
-
-      console.log("Data Project:", projects);
-    }
+    console.log("Data Project:", projectDataList);
   }
 });
 
-// Kalo View Details di Klik
-projectContainerEL.addEventListener("click", function (e) {
-  console.log(e);
-  if (e.target.classList.contains("btn-view-details")) {
-    const projectId = e.target.getAttribute("data-id");
-    console.log(projectId);
-    const project = projects.find((p) => p.id == projectId);
+// Menangani klik pada tombol detail dan delete
+projectContainer.addEventListener("click", function (event) {
+  console.log(event);
 
-    if (project) {
-      document.getElementById("modalTitle").textContent = project.name;
-      document.getElementById("modalImage").src = project.image;
-      document.getElementById("modalDuration").textContent = project.duration;
+  if (event.target.classList.contains("btn-view-details")) {
+    const selectedProjectId = event.target.getAttribute("data-id");
+    console.log(selectedProjectId);
+
+    const selectedProject = projectDataList.find(
+      (projectItem) => projectItem.id == selectedProjectId,
+    );
+
+    if (selectedProject) {
+      document.getElementById("modalTitle").textContent = selectedProject.name;
+      document.getElementById("modalImage").src = selectedProject.image;
+      document.getElementById("modalDuration").textContent =
+        selectedProject.duration;
       document.getElementById("modalDescription").textContent =
-        project.description;
+        selectedProject.description;
 
-      let techIconsHTML = "";
-      if (project.techNodeJs)
-        techIconsHTML += '<i class="fa-brands fa-node-js fs-4 p-1"></i> ';
-      if (project.techNextJs)
-        techIconsHTML += '<span class="fw-bold fs-6 p-1">Next.JS</span> ';
-      if (project.techReactJs)
-        techIconsHTML += '<i class="fa-brands fa-react fs-4 p-1"></i> ';
-      if (project.techTypescript)
-        techIconsHTML += '<span class="fw-bold fs-6 p-1">TS</span> ';
+      let technologyIconsHTML = "";
+      if (selectedProject.techNodeJs)
+        technologyIconsHTML += '<i class="fa-brands fa-node-js fs-4 p-1"></i> ';
+      if (selectedProject.techNextJs)
+        technologyIconsHTML += '<span class="fw-bold fs-6 p-1">Next.JS</span> ';
+      if (selectedProject.techReactJs)
+        technologyIconsHTML += '<i class="fa-brands fa-react fs-4 p-1"></i> ';
+      if (selectedProject.techTypescript)
+        technologyIconsHTML += '<span class="fw-bold fs-6 p-1">TS</span> ';
 
-      document.getElementById("modalTechnologies").innerHTML = techIconsHTML;
+      document.getElementById("modalTechnologies").innerHTML =
+        technologyIconsHTML;
 
-      // Tampilkan Modal
-      projectModal.classList.remove("d-none");
-      projectModal.classList.add("d-flex");
+      // Tampilkan modal
+      projectDetailModal.classList.remove("d-none");
+      projectDetailModal.classList.add("d-flex");
     }
-  } else if (e.target.classList.contains("btn-delete")) {
-    // Ambil data-id yang di Klik
-    const projectId = e.target.getAttribute("data-id");
+  } else if (event.target.classList.contains("btn-delete")) {
+    // Ambil data-id dari tombol delete yang diklik
+    const selectedProjectId = event.target.getAttribute("data-id");
 
     if (confirm("Yakin ingin menghapus Project Ini?")) {
-      // Cari Project yang id nya sama dengan data-id yang di Klik
-      projects = projects.filter((item) => item.id != projectId);
+      // Hapus project yang id-nya sesuai
+      projectDataList = projectDataList.filter(
+        (projectItem) => projectItem.id != selectedProjectId,
+      );
 
-      saveToLocalStorage();
-      renderProjects();
+      saveProjectsToLocalStorage();
+      renderProjectList();
     } else {
       return;
     }
   }
 });
 
-// Tutup Modal
-closeModalBtn.addEventListener("click", function () {
-  projectModal.classList.remove("d-flex");
-  projectModal.classList.add("d-none");
+// Menutup modal dari tombol close
+closeProjectModalButton.addEventListener("click", function () {
+  projectDetailModal.classList.remove("d-flex");
+  projectDetailModal.classList.add("d-none");
 });
 
-// Tutup Modal di Body Modal
-projectModal.addEventListener("click", function (e) {
-  if (e.target === projectModal) {
-    projectModal.classList.remove("d-flex");
-    projectModal.classList.add("d-none");
+// Menutup modal saat area luar konten modal diklik
+projectDetailModal.addEventListener("click", function (event) {
+  if (event.target === projectDetailModal) {
+    projectDetailModal.classList.remove("d-flex");
+    projectDetailModal.classList.add("d-none");
   }
 });
 
 // ======================================
-// INITIALIZATIONS
+// INITIALIZATION
 // ======================================
-renderProjects();
+
+renderProjectList();
