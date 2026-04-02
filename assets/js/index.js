@@ -6,6 +6,8 @@ const inputProjectName = document.getElementById("projectName");
 const inputProjectDescription = document.getElementById("projectDescription");
 const inputProjectStartDate = document.getElementById("projectStartDate");
 const inputProjectEndDate = document.getElementById("projectEndDate");
+// Projects Container
+const projectsContainer = document.getElementById("projectContainer");
 // Ambil Image
 const inputProjectImage = document.getElementById("projectImage");
 // Body Form
@@ -28,7 +30,6 @@ if (savedProjects) {
 // FUNCTIONS
 // ======================================
 function renderProjects() {
-  const projectsContainer = document.getElementById("projectContainer");
   let projectHTML = "";
 
   if (projects.length === 0) {
@@ -40,74 +41,16 @@ function renderProjects() {
     </h5>
     `;
   } else {
-    projects.forEach((project) => {
-      let techIconsHTML = "";
+    const projectInnerHTML = projects
+      .map((project) => renderCardProject(project))
+      .join("");
+    // console.log(projectInnerHTML);
 
-      if (project.techNodeJs == true) {
-        techIconsHTML += '<i class="fa-brands fa-node-js fs-4 p-1"></i> ';
-      }
-      if (project.techNextJs == true) {
-        techIconsHTML += '<span class="fw-bold fs-6 p-1">Next.JS</span> ';
-      }
-      if (project.techReactJs == true) {
-        techIconsHTML += '<i class="fa-brands fa-react fs-4 p-1"></i> ';
-      }
-      if (project.techTypescript == true) {
-        techIconsHTML += '<span class="fw-bold fs-6 p-1">TS</span> ';
-      }
-      projectHTML += `
-        <div class="col-12 col-md-6 col-lg-4">
-          <div class="card h-100 shadow-sm border-0 rounded-4 p-3 bg-white up-effect">
-            <img
-              src="${project.image}"
-              class="card-img-top rounded-3"
-              alt="Project Image"
-              style="object-fit: cover; height: 200px"
-            />
-            <div class="card-body px-0 pb-0 text-start d-flex flex-column">
-              <h5 class="card-title fw-bold mb-1 text-decoration-none text-dark">
-                ${project.name}
-              </h5>
-              <p class="text-secondary small mb-3">Duration: ${project.duration}</p>
-              <p
-                class="card-text text-secondary mb-4"
-                style="
-                  display: -webkit-box;
-                  -webkit-line-clamp: 3;
-                  line-clamp: 3;
-                  -webkit-box-orient: vertical;
-                  overflow: hidden;
-                "
-              >
-                ${project.description}
-              </p>
-              <div class="mb-3 text-secondary d-flex align-items-center gap-2">
-                 ${techIconsHTML}
-              </div>
-              <div class="d-flex gap-2 w-100 mt-auto">
-                <button 
-                  class="btn btn-outline-dark w-100 rounded-pill btn-view-details"
-                  data-id="${project.id}"
-                >
-                  View Details
-                </button>
-                <button 
-                  class="btn btn-dark w-50 rounded-pill btn-delete"
-                  data-id="${project.id}"
-                >
-                  Delete
-                </button> 
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    });
+    projectsContainer.innerHTML = projectInnerHTML;
   }
-
-  projectsContainer.innerHTML = projectHTML;
 }
 
+// Menghitung Jumlah Bulan
 function calculateDurationReadable(startDate, endDate) {
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -123,6 +66,71 @@ function calculateDurationReadable(startDate, endDate) {
 // Untuk nyimpen di LocalStorage
 function saveToLocalStorage() {
   localStorage.setItem("projects", JSON.stringify(projects));
+}
+
+// Render Card
+function renderCardProject(project) {
+  let techIconsHTML = "";
+
+  if (project.techNodeJs == true) {
+    techIconsHTML += '<i class="fa-brands fa-node-js fs-4 p-1"></i> ';
+  }
+  if (project.techNextJs == true) {
+    techIconsHTML += '<span class="fw-bold fs-6 p-1">Next.JS</span> ';
+  }
+  if (project.techReactJs == true) {
+    techIconsHTML += '<i class="fa-brands fa-react fs-4 p-1"></i> ';
+  }
+  if (project.techTypescript == true) {
+    techIconsHTML += '<span class="fw-bold fs-6 p-1">TS</span> ';
+  }
+
+  return /* HTML */ `
+    <div class="col-12 col-md-6 col-lg-4">
+      <div
+        class="card h-100 shadow-sm border-0 rounded-4 p-3 bg-white up-effect"
+      >
+        <img
+          src="${project.image}"
+          class="card-img-top rounded-3"
+          alt="Project Image"
+          style="object-fit: cover; height: 200px;"
+        />
+        <div class="card-body px-0 pb-0 text-start d-flex flex-column">
+          <h5 class="card-title fw-bold mb-1 text-dark">${project.name}</h5>
+          <p class="text-secondary small mb-3">Duration: ${project.duration}</p>
+          <p
+            class="card-text text-secondary mb-4"
+            style="
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          "
+          >
+            ${project.description}
+          </p>
+          <div class="mb-3 text-secondary d-flex align-items-center gap-2">
+            ${techIconsHTML}
+          </div>
+          <div class="d-flex gap-2 w-100 mt-auto">
+            <button
+              class="btn btn-outline-dark w-100 rounded-pill btn-view-details"
+              data-id="${project.id}"
+            >
+              View Details
+            </button>
+            <button
+              class="btn btn-dark w-50 rounded-pill btn-delete"
+              data-id="${project.id}"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 // ======================================
